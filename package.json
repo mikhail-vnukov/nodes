@@ -9,10 +9,14 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "npm run dev -w client",
-    "dev:server": "npm run dev -w server"
+    "dev:server": "npm run dev -w server",
+    "test": "playwright test --project=dev",
+    "test:full": "playwright test --project=chromium-full --project=firefox --project=webkit"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@playwright/test": "^1.52.0",
+    "concurrently": "^8.2.2",
+    "playwright": "^1.52.0"
   },
   "dependencies": {
     "@types/cors": "^2.8.18",
