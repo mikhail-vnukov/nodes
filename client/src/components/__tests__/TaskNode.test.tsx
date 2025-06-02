@@ -1,15 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { TaskNode } from '../TaskNode';
-import { NodeProps } from 'reactflow';
-import { Task } from '../../types/task';
-import { ReactFlowProvider } from 'reactflow';
+import { render, screen } from "@testing-library/react";
+import { TaskNode } from "../TaskNode";
+import { NodeProps } from "reactflow";
+import { Task } from "../../types/task";
+import { ReactFlowProvider } from "reactflow";
 
-describe('TaskNode', () => {
+describe("TaskNode", () => {
   const mockTask: Task = {
-    id: '1',
-    title: 'Test Task',
-    description: 'Test Description',
-    status: 'TODO',
+    id: "1",
+    title: "Test Task",
+    description: "Test Description",
+    status: "TODO",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -18,24 +18,24 @@ describe('TaskNode', () => {
     data: mockTask,
   } as NodeProps<Task>;
 
-  it('renders task title and description', () => {
+  it("renders task title and description", () => {
     render(
       <ReactFlowProvider>
         <TaskNode {...mockProps} />
-      </ReactFlowProvider>
+      </ReactFlowProvider>,
     );
-    
-    expect(screen.getByText('Test Task')).toBeInTheDocument();
-    expect(screen.getByText('Test Description')).toBeInTheDocument();
+
+    expect(screen.getByText("Test Task")).toBeInTheDocument();
+    expect(screen.getByText("Test Description")).toBeInTheDocument();
   });
 
-  it('renders task status chip', () => {
+  it("renders task status chip", () => {
     render(
       <ReactFlowProvider>
         <TaskNode {...mockProps} />
-      </ReactFlowProvider>
+      </ReactFlowProvider>,
     );
-    
-    expect(screen.getByText('TODO')).toBeInTheDocument();
+
+    expect(screen.getByText("TODO")).toBeInTheDocument();
   });
-}); 
+});

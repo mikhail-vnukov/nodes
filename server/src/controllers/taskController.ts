@@ -52,7 +52,8 @@ export const getTasks = async (_req: Request, res: Response) => {
       `)
     );
 
-    const tasks = result.records.map(record => record.get('t').properties);
+    const records = result?.records ?? [];
+    const tasks = records.map(record => record.get('t')?.properties).filter(Boolean);
     res.json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -231,9 +232,6 @@ export const deleteTask = async (req: Request, res: Response) => {
 };
 
 export const deleteAllTasks = async (_req: Request, res: Response) => {
-  if (process.env.NODE_ENV !== 'test') {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
   const driver = getDriver();
   const session = driver.session();
   try {

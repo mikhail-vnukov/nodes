@@ -1,7 +1,7 @@
-import { http, HttpResponse } from 'msw';
-import { Task } from '../types/task';
+import { http, HttpResponse } from "msw";
+import { Task } from "../types/task";
 
-const baseUrl = 'http://localhost:3000/api';
+const baseUrl = "http://localhost:3000/api";
 
 export const handlers = [
   // Get tasks
@@ -10,10 +10,10 @@ export const handlers = [
       nodes: [
         {
           task: {
-            id: '1',
-            title: 'Test Task',
-            description: 'Test Description',
-            status: 'TODO',
+            id: "1",
+            title: "Test Task",
+            description: "Test Description",
+            status: "TODO",
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -28,7 +28,7 @@ export const handlers = [
   http.post(`${baseUrl}/tasks`, async ({ request }) => {
     const task = (await request.json()) as Partial<Task>;
     return HttpResponse.json({
-      id: '2',
+      id: "2",
       ...task,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -44,7 +44,7 @@ export const handlers = [
   // Summarize tasks
   http.get(`${baseUrl}/tasks/:taskId/summarize`, () => {
     return HttpResponse.json({
-      summary: 'Test summary of connected tasks',
+      summary: "Test summary of connected tasks",
       tasks: [],
     });
   }),
@@ -53,14 +53,14 @@ export const handlers = [
   http.post(`${baseUrl}/tasks/:taskId/decompose`, () => {
     return HttpResponse.json([
       {
-        id: '3',
-        title: 'Subtask 1',
-        description: 'Test subtask',
-        status: 'TODO',
+        id: "3",
+        title: "Subtask 1",
+        description: "Test subtask",
+        status: "TODO",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        parentId: '1',
+        parentId: "1",
       },
     ]);
   }),
-]; 
+];

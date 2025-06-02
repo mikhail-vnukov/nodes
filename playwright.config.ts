@@ -10,14 +10,8 @@ export default defineConfig({
     actionTimeout: 5000,
   },
   projects: [
-    // Dev profile: only Chromium
     {
-      name: 'dev',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    // Full profile: all three browsers
-    {
-      name: 'chromium-full',
+      name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
     {

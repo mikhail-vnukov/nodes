@@ -25,9 +25,6 @@ router.get('/graph', getTaskGraph);
 router.get('/tasks/:taskId/summarize', summarizeConnectedTasks);
 router.post('/tasks/:taskId/decompose', decomposeTask);
 
-// Test-only: delete all tasks
-if (process.env.NODE_ENV === 'test') {
-  router.delete('/test/tasks', deleteAllTasks);
-}
+router.delete('/tasks', deleteAllTasks);
 
 export default router; 

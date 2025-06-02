@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,10 +6,10 @@ import {
   DialogActions,
   Button,
   Typography,
-  CircularProgress
-} from '@mui/material';
-import { Task } from '../types/task';
-import { useTaskStore } from '../store/taskStore';
+  CircularProgress,
+} from "@mui/material";
+import { Task } from "../types/task";
+import { useTaskStore } from "../store/taskStore";
 
 interface TaskDialogProps {
   task: Task;
@@ -27,7 +27,7 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
       const summary = await summarizeConnectedTasks(task.id);
       setSummary(summary);
     } catch (error) {
-      console.error('Error summarizing tasks:', error);
+      console.error("Error summarizing tasks:", error);
     }
     setLoading(false);
   };
@@ -38,7 +38,7 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
       await decomposeTask(task.id);
       onClose();
     } catch (error) {
-      console.error('Error decomposing task:', error);
+      console.error("Error decomposing task:", error);
     }
     setLoading(false);
   };
@@ -49,7 +49,7 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
       await deleteTask(task.id);
       onClose();
     } catch (error) {
-      console.error('Error deleting task:', error);
+      console.error("Error deleting task:", error);
     }
     setLoading(false);
   };
@@ -88,15 +88,11 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
         >
           Decompose
         </Button>
-        <Button
-          onClick={handleDelete}
-          color="error"
-          disabled={loading}
-        >
+        <Button onClick={handleDelete} color="error" disabled={loading}>
           Delete
         </Button>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );
-}; 
+};

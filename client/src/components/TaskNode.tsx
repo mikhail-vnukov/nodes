@@ -1,17 +1,20 @@
-import { memo } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
-import { Card, CardContent, Typography, Chip } from '@mui/material';
-import { Task } from '../types/task';
+import { memo } from "react";
+import { Handle, Position, NodeProps } from "reactflow";
+import { Card, CardContent, Typography, Chip } from "@mui/material";
+import { Task } from "../types/task";
 
 const statusColors = {
-  TODO: 'default',
-  IN_PROGRESS: 'primary',
-  DONE: 'success'
+  TODO: "default",
+  IN_PROGRESS: "primary",
+  DONE: "success",
 } as const;
 
 export const TaskNode = memo(({ data }: NodeProps<Task>) => {
   return (
-    <div style={{ background: 'transparent' }} data-testid={`task-node-${data.title.replace(/\s+/g, '-')}`}>
+    <div
+      style={{ background: "transparent" }}
+      data-testid={`task-node-${data.title.replace(/\s+/g, "-")}`}
+    >
       <Handle type="target" position={Position.Top} />
       <Card sx={{ minWidth: 200, maxWidth: 300 }}>
         <CardContent>
@@ -22,11 +25,11 @@ export const TaskNode = memo(({ data }: NodeProps<Task>) => {
             variant="body2"
             color="text.secondary"
             sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
               WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical'
+              WebkitBoxOrient: "vertical",
             }}
           >
             {data.description}
@@ -42,4 +45,6 @@ export const TaskNode = memo(({ data }: NodeProps<Task>) => {
       <Handle type="source" position={Position.Bottom} />
     </div>
   );
-}); 
+});
+
+TaskNode.displayName = "TaskNode";
