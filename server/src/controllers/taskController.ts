@@ -204,4 +204,47 @@ export const decomposeTask = async (req: Request, res: Response) => {
   } finally {
     await session.close();
   }
+};
+
+export const deleteTask = async (req: Request, res: Response) => {
+  const { taskId } = req.params;
+  const driver = getDriver();
+  const session = driver.session();
+
+  try {
+    await session.executeWrite(tx =>
+      tx.run(
+        `
+        MATCH (t:Task {id: $taskId})
+        DETACH DELETE t
+        `,
+        { taskId }
+      )
+    );
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    res.status(500).json({ error: 'Failed to delete task' });
+  } finally {
+    await session.close();
+  }
+};
+
+export const deleteAllTasks = async (_req: Request, res: Response) => {
+  if (process.env.NODE_ENV !== 'test') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  const driver = getDriver();
+  const session = driver.session();
+  try {
+    await session.executeWrite(tx =>
+      tx.run(`MATCH (t:Task) DETACH DELETE t`)
+    );
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting all tasks:', error);
+    res.status(500).json({ error: 'Failed to delete all tasks' });
+  } finally {
+    await session.close();
+  }
 }; 

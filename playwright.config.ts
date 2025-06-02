@@ -7,6 +7,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:5173/',
     trace: 'on-first-retry',
+    actionTimeout: 5000,
   },
   projects: [
     // Dev profile: only Chromium

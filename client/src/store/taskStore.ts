@@ -3,7 +3,7 @@ import { Node, Edge } from 'reactflow';
 import axios from 'axios';
 import { Task, TaskRelationship } from '../types/task';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 interface TaskState {
   nodes: Node[];
@@ -15,6 +15,7 @@ interface TaskState {
   createRelationship: (relationship: Omit<TaskRelationship, 'weight'>) => Promise<void>;
   summarizeConnectedTasks: (taskId: string) => Promise<string>;
   decomposeTask: (taskId: string) => Promise<Task[]>;
+  deleteTask: (taskId: string) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskState>((set) => ({
@@ -92,6 +93,18 @@ export const useTaskStore = create<TaskState>((set) => ({
     } catch (error) {
       console.error('Error decomposing task:', error);
       return [];
+    }
+  },
+
+  deleteTask: async (taskId) => {
+    try {
+      await axios.delete(`${API_URL}/tasks/${taskId}`);
+      set((state) => ({
+        nodes: state.nodes.filter((node) => node.id !== taskId),
+        edges: state.edges.filter((edge) => edge.source !== taskId && edge.target !== taskId),
+      }));
+    } catch (error) {
+      console.error('Error deleting task:', error);
     }
   },
 })); 

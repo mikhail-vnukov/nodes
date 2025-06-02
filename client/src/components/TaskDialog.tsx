@@ -19,7 +19,7 @@ interface TaskDialogProps {
 export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
-  const { summarizeConnectedTasks, decomposeTask } = useTaskStore();
+  const { summarizeConnectedTasks, decomposeTask, deleteTask } = useTaskStore();
 
   const handleSummarize = async () => {
     setLoading(true);
@@ -39,6 +39,17 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
       onClose();
     } catch (error) {
       console.error('Error decomposing task:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await deleteTask(task.id);
+      onClose();
+    } catch (error) {
+      console.error('Error deleting task:', error);
     }
     setLoading(false);
   };
@@ -76,6 +87,13 @@ export const TaskDialog = ({ task, onClose }: TaskDialogProps) => {
           startIcon={loading && <CircularProgress size={20} />}
         >
           Decompose
+        </Button>
+        <Button
+          onClick={handleDelete}
+          color="error"
+          disabled={loading}
+        >
+          Delete
         </Button>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>

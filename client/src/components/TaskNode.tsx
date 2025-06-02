@@ -11,7 +11,7 @@ const statusColors = {
 
 export const TaskNode = memo(({ data }: NodeProps<Task>) => {
   return (
-    <div style={{ background: 'transparent' }}>
+    <div style={{ background: 'transparent' }} data-testid={`task-node-${data.title.replace(/\s+/g, '-')}`}>
       <Handle type="target" position={Position.Top} />
       <Card sx={{ minWidth: 200, maxWidth: 300 }}>
         <CardContent>

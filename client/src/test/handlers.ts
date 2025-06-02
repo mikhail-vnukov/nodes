@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { Task } from '../types/task';
 
-const baseUrl = 'http://localhost:3001/api';
+const baseUrl = 'http://localhost:3000/api';
 
 export const handlers = [
   // Get tasks

@@ -34,6 +34,12 @@ function App() {
     createRelationship
   } = useTaskStore();
 
+  // Expose the store for E2E debugging
+  if (typeof window !== 'undefined') {
+    // @ts-ignore
+    window.__zustandStore = useTaskStore;
+  }
+
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       updateNodes(applyNodeChanges(changes, nodes));
