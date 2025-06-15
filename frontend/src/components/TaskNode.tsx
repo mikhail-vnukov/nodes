@@ -12,6 +12,11 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
   const [editText, setEditText] = useState(data.label)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Update local edit text when data changes
+  useEffect(() => {
+    setEditText(data.label)
+  }, [data.label])
+
   // Focus input when editing starts
   useEffect(() => {
     if (data.isEditing && inputRef.current) {
@@ -82,12 +87,6 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
             data-testid="task-node-label"
           >
             {data.label}
-          </div>
-        )}
-        
-        {!data.isEditing && (
-          <div className="task-node-hint">
-            Double-click to edit
           </div>
         )}
       </div>

@@ -92,20 +92,6 @@ html, body {
   background: #f7fafc;
 }
 
-.task-node-hint {
-  font-size: 10px;
-  color: #a0aec0;
-  margin-top: 4px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.task-node:hover .task-node-hint {
-  opacity: 1;
-}
-
 /* ReactFlow handle styles */
 .react-flow__handle {
   background: #1a192b;

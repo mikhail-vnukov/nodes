@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -22,23 +22,49 @@ function FlowCanvas() {
     onNodesChange, 
     onEdgesChange, 
     onConnect,
-    stopEditingNode
+    stopEditingNode,
+    editingNodeId
   } = useNodeStore()
   
   const { screenToFlowPosition } = useReactFlow()
+  const clickCountRef = useRef<number>(0)
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const onPaneClick = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>) => {
-      // Stop editing any node when clicking on empty canvas
-      stopEditingNode()
-      
-      const position = screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY
-      })
-      addNode(position)
+      clickCountRef.current += 1
+
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current)
+      }
+
+      clickTimeoutRef.current = setTimeout(() => {
+        if (clickCountRef.current === 1) {
+          // Single click - just stop editing if there's an editing node
+          if (editingNodeId) {
+            stopEditingNode()
+          }
+        } else if (clickCountRef.current >= 2) {
+          // Double click - create new node
+          const position = screenToFlowPosition({
+            x: event.clientX,
+            y: event.clientY
+          })
+          
+          // If there's a node being edited, just stop editing (don't create new node)
+          if (editingNodeId) {
+            stopEditingNode()
+            return
+          }
+          
+          // Add new node centered at cursor position and immediately start editing
+          addNode(position, true)
+        }
+        
+        clickCountRef.current = 0
+      }, 200) // Shorter timeout for faster response
     },
-    [screenToFlowPosition, addNode, stopEditingNode]
+    [screenToFlowPosition, addNode, stopEditingNode, editingNodeId]
   )
 
   return (
@@ -61,9 +87,9 @@ function FlowCanvas() {
             borderRadius: '5px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            <div>Click anywhere on the canvas to add a new task node</div>
+            <div>Double-click anywhere on the canvas to add a new task node</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-              Double-click any node to edit its text
+              New nodes start in edit mode. Double-click existing nodes to edit.
             </div>
           </div>
         </Panel>

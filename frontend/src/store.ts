@@ -13,7 +13,7 @@ interface NodeStore {
   edges: Edge[]
   nodeCounter: number
   editingNodeId: string | null
-  addNode: (position: { x: number; y: number }) => void
+  addNode: (position: { x: number; y: number }, startEditing?: boolean) => void
   updateNodeText: (nodeId: string, newText: string) => void
   startEditingNode: (nodeId: string) => void
   stopEditingNode: () => void
@@ -28,21 +28,32 @@ export const useNodeStore = create<NodeStore>((set, get) => ({
   nodeCounter: 0,
   editingNodeId: null,
   
-  addNode: (position) => {
+  addNode: (position, startEditing = false) => {
     const counter = get().nodeCounter + 1
+    const nodeId = `node-${counter}`
+    
+    // Center the node at the cursor position
+    // Based on CSS: min-width 120px, padding 12px each side, min-height ~40px + padding 12px each side
+    // Total approximate dimensions: 144px width (120 + 24), 64px height (40 + 24)
+    const centeredPosition = {
+      x: position.x - 60, // Half of approximate width (120px + padding)
+      y: position.y - 32  // Half of approximate height (64px total)
+    }
+    
     const newNode: TaskNode = {
-      id: `node-${counter}`,
+      id: nodeId,
       type: 'taskNode',
-      position,
+      position: centeredPosition,
       data: {
         label: `Task ${counter}`,
-        isEditing: false
+        isEditing: startEditing
       }
     }
     
     set((state) => ({
       nodes: [...state.nodes, newNode],
-      nodeCounter: counter
+      nodeCounter: counter,
+      editingNodeId: startEditing ? nodeId : state.editingNodeId
     }))
   },
 
