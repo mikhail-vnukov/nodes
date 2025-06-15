@@ -15,6 +15,7 @@ interface NodeStore {
   nodeCounter: number
   editingNodeId: string | null
   addNode: (position: { x: number; y: number }, startEditing?: boolean) => void
+  addNodeFromConnector: (sourceNodeId: string, handleType: 'source' | 'target') => void
   updateNodeText: (nodeId: string, newText: string) => void
   startEditingNode: (nodeId: string) => void
   stopEditingNode: () => void
@@ -105,6 +106,79 @@ export const useNodeStore = create<NodeStore>()(
         }
         return newState
       })
+    },
+
+    addNodeFromConnector: (sourceNodeId, handleType) => {
+      const sourceNode = get().nodes.find(node => node.id === sourceNodeId)
+      if (!sourceNode) return
+
+      const counter = get().nodeCounter + 1
+      const newNodeId = `node-${counter}`
+      
+      // Calculate position for the new node based on handle type
+      const offsetDistance = 150 // Distance between nodes
+      let newPosition: { x: number; y: number }
+      
+      if (handleType === 'source') {
+        // Create node below the source node
+        newPosition = {
+          x: sourceNode.position.x,
+          y: sourceNode.position.y + offsetDistance
+        }
+      } else {
+        // Create node above the target node  
+        newPosition = {
+          x: sourceNode.position.x,
+          y: sourceNode.position.y - offsetDistance
+        }
+      }
+      
+      const newNode: TaskNode = {
+        id: newNodeId,
+        type: 'taskNode',
+        position: newPosition,
+        data: {
+          label: `Task ${counter}`,
+          isEditing: true // Start in edit mode for new connector-created nodes
+        }
+      }
+
+      // Create the connection between nodes
+      let newEdge: Edge
+      if (handleType === 'source') {
+        // Connect source node's bottom to new node's top
+        newEdge = {
+          id: `edge-${sourceNodeId}-${newNodeId}`,
+          source: sourceNodeId,
+          target: newNodeId,
+          sourceHandle: null,
+          targetHandle: null
+        }
+      } else {
+        // Connect new node's bottom to target node's top
+        newEdge = {
+          id: `edge-${newNodeId}-${sourceNodeId}`,
+          source: newNodeId,
+          target: sourceNodeId,
+          sourceHandle: null,
+          targetHandle: null
+        }
+      }
+      
+      set((state) => ({
+        nodes: [
+          // Set all existing nodes to not editing
+          ...state.nodes.map((node) => ({
+            ...node,
+            data: { ...node.data, isEditing: false }
+          })),
+          // Add the new node
+          newNode
+        ],
+        edges: [...state.edges, newEdge],
+        nodeCounter: counter,
+        editingNodeId: newNodeId
+      }))
     },
 
     updateNodeText: (nodeId, newText) => {

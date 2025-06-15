@@ -89,6 +89,7 @@ function FlowCanvas() {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
             <div>Double-click anywhere on the canvas to add a new task node</div>
+            <div>Click on a connector (top/bottom circles) to create a connected task</div>
             <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
               New nodes start in edit mode. Double-click existing nodes to edit.
             </div>

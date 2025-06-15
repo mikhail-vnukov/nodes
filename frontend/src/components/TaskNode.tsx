@@ -8,7 +8,7 @@ interface TaskNodeData {
 }
 
 const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => {
-  const { updateNodeText, startEditingNode, stopEditingNode } = useNodeStore()
+  const { updateNodeText, startEditingNode, stopEditingNode, addNodeFromConnector } = useNodeStore()
   const [editText, setEditText] = useState(data.label)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -62,6 +62,11 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
     stopEditingNode()
   }
 
+  const handleConnectorClick = (e: React.MouseEvent, handleType: 'source' | 'target') => {
+    e.stopPropagation()
+    addNodeFromConnector(id, handleType)
+  }
+
   return (
     <div 
       className={`task-node ${selected ? 'selected' : ''}`}
@@ -71,7 +76,8 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
       <Handle
         type="target"
         position={Position.Top}
-        style={{ background: '#555' }}
+        style={{ background: '#555', cursor: 'pointer' }}
+        onClick={(e) => handleConnectorClick(e, 'target')}
       />
       
       <div className="task-node-content">
@@ -99,7 +105,8 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
       <Handle
         type="source"
         position={Position.Bottom}
-        style={{ background: '#555' }}
+        style={{ background: '#555', cursor: 'pointer' }}
+        onClick={(e) => handleConnectorClick(e, 'source')}
       />
     </div>
   )
