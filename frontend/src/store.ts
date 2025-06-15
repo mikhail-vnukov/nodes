@@ -50,11 +50,22 @@ export const useNodeStore = create<NodeStore>((set, get) => ({
       }
     }
     
-    set((state) => ({
-      nodes: [...state.nodes, newNode],
-      nodeCounter: counter,
-      editingNodeId: startEditing ? nodeId : state.editingNodeId
-    }))
+    set((state) => {
+      const newState = {
+        nodes: [
+          // Set all existing nodes to not editing
+          ...state.nodes.map((node) => ({
+            ...node,
+            data: { ...node.data, isEditing: false }
+          })),
+          // Add the new node
+          newNode
+        ],
+        nodeCounter: counter,
+        editingNodeId: startEditing ? nodeId : null
+      }
+      return newState
+    })
   },
 
   updateNodeText: (nodeId, newText) => {

@@ -27,42 +27,43 @@ function FlowCanvas() {
   } = useNodeStore()
   
   const { screenToFlowPosition } = useReactFlow()
-  const clickCountRef = useRef<number>(0)
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const clickCountRef = useRef<number>(0)
+  const lastClickPositionRef = useRef<{ x: number; y: number } | null>(null)
 
   const onPaneClick = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>) => {
       clickCountRef.current += 1
+      
+      // Capture the position immediately
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY
+      })
+      lastClickPositionRef.current = position
 
+      // Clear any existing timeout
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current)
       }
 
+      // Set a timeout to determine if this is a single or double click
       clickTimeoutRef.current = setTimeout(() => {
         if (clickCountRef.current === 1) {
           // Single click - just stop editing if there's an editing node
           if (editingNodeId) {
             stopEditingNode()
           }
-        } else if (clickCountRef.current >= 2) {
+        } else if (clickCountRef.current >= 2 && lastClickPositionRef.current) {
           // Double click - create new node
-          const position = screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY
-          })
-          
-          // If there's a node being edited, just stop editing (don't create new node)
-          if (editingNodeId) {
-            stopEditingNode()
-            return
-          }
-          
-          // Add new node centered at cursor position and immediately start editing
-          addNode(position, true)
+          addNode(lastClickPositionRef.current, true)
         }
         
+        // Reset click count and position
         clickCountRef.current = 0
-      }, 200) // Shorter timeout for faster response
+        lastClickPositionRef.current = null
+        clickTimeoutRef.current = null
+      }, 250) // 250ms window for double-click detection
     },
     [screenToFlowPosition, addNode, stopEditingNode, editingNodeId]
   )
