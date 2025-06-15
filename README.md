@@ -1,100 +1,131 @@
-# Graph-Based Task Manager
+# Node Canvas App
 
-A modern task management application that represents tasks as nodes in a graph, with edges representing relationships between tasks. Features include AI-powered task summarization and decomposition.
+A ReactFlow-based task management application with interactive node creation and E2E testing.
 
 ## Features
 
-- Graph-based task visualization using React Flow
-- Task relationships (dependencies, semantic similarity)
-- AI-powered task summarization and decomposition
-- Interactive zooming and manipulation of task nodes
-- Modern UI with Material-UI components
-
-## Tech Stack
-
-- **Frontend**: React, TypeScript, React Flow, Material-UI
-- **Backend**: Node.js, Express, TypeScript
-- **Database**: Neo4j
-- **AI**: OpenAI API
-
-## Prerequisites
-
-- Node.js (v18 or later)
-- Neo4j Database
-- OpenAI API Key
-
-## Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd graph-task-manager
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-# Server
-cp server/.env.example server/.env
-# Edit server/.env with your Neo4j and OpenAI credentials
-
-# Client
-cp client/.env.example client/.env
-```
-
-4. Start Neo4j database
-
-5. Start the development servers:
-```bash
-# Start both client and server
-npm run dev
-```
+- **Interactive Canvas**: Click anywhere on the canvas to create new task nodes
+- **Auto-incremented Labels**: Nodes are automatically labeled as "Task 1", "Task 2", etc.
+- **ReactFlow Integration**: Built on top of ReactFlow for professional node-based interfaces
+- **State Management**: Uses Zustand for simple and efficient state management
+- **E2E Testing**: Comprehensive Playwright tests for user interactions
 
 ## Project Structure
 
 ```
-.
-├── client/                 # Frontend React application
+nodes/
+├── package.json          # Root workspace configuration
+├── frontend/
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── services/     # API services
-│   │   ├── store/        # Zustand store
-│   │   └── types/        # TypeScript types
-│   └── package.json
-├── server/                # Backend Express application
-│   ├── src/
-│   │   ├── config/       # Configuration files
-│   │   ├── controllers/  # Route controllers
-│   │   ├── models/       # Data models
-│   │   ├── routes/       # Express routes
-│   │   ├── services/     # Business logic
-│   │   └── types/        # TypeScript types
-│   └── package.json
-└── package.json          # Root package.json
+│   │   ├── App.tsx       # Main React component with ReactFlow
+│   │   ├── store.ts      # Zustand store for state management
+│   │   ├── main.tsx      # React entry point
+│   │   └── index.css     # Styling
+│   ├── tests/
+│   │   └── basic-interaction.spec.ts  # E2E tests
+│   ├── playwright.config.ts           # Playwright configuration
+│   └── package.json                   # Frontend dependencies
+└── README.md
 ```
 
-## API Endpoints
+## Technology Stack
 
-- `POST /api/tasks` - Create a new task
-- `GET /api/tasks` - Get all tasks
-- `POST /api/relationships` - Create a task relationship
-- `GET /api/graph` - Get the entire task graph
-- `GET /api/tasks/:taskId/summarize` - Summarize connected tasks
-- `POST /api/tasks/:taskId/decompose` - Decompose a task into subtasks
+- **Frontend**: Vite + React + TypeScript
+- **Node Interface**: ReactFlow
+- **State Management**: Zustand
+- **E2E Testing**: Playwright (Chromium, Firefox, WebKit)
+- **Build Tool**: Vite
+- **Linting**: ESLint with TypeScript support
 
-## Contributing
+## Getting Started
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Prerequisites
 
-## License
+- Node.js >= 18.0.0
+- npm >= 8.0.0
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+### Installation
+
+1. Install dependencies:
+   ```bash
+   npm run install-all
+   ```
+
+2. Install Playwright browsers:
+   ```bash
+   cd frontend
+   npm run test:install
+   ```
+
+### Development
+
+Start the development server:
+```bash
+npm run dev
+```
+
+This will start the Vite dev server at `http://localhost:5173`
+
+### Usage
+
+1. **Adding Nodes**: Click anywhere on the blank canvas to create a new task node
+2. **Node Labels**: Each node is automatically labeled with an incremented task number
+3. **Moving Nodes**: Drag nodes around the canvas to reposition them
+4. **Connecting Nodes**: Drag from node handles to create connections (if needed)
+
+### Testing
+
+Run E2E tests:
+```bash
+npm run test:e2e
+```
+
+Run tests with UI:
+```bash
+cd frontend
+npm run test:e2e:ui
+```
+
+View test report:
+```bash
+cd frontend
+npx playwright show-report
+```
+
+### Test Coverage
+
+The E2E tests cover:
+- ✅ Canvas loading and visibility
+- ✅ Node creation on click
+- ✅ Multiple node creation
+- ✅ Node positioning verification
+- ✅ Auto-incremented labeling
+
+## Scripts
+
+### Root Level
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run test:e2e` - Run E2E tests
+
+### Frontend Level
+- `npm run dev` - Start Vite dev server
+- `npm run build` - Build React app
+- `npm run test:e2e` - Run Playwright tests
+- `npm run test:e2e:ui` - Run tests with Playwright UI
+- `npm run lint` - Lint TypeScript/React code
+
+## Development Notes
+
+- The app uses ReactFlow's built-in `onPaneClick` event to handle canvas clicks
+- State is managed through Zustand with proper ReactFlow change handlers
+- All E2E tests run across Chromium, Firefox, and WebKit browsers
+- The Playwright config includes automatic dev server startup for testing
+
+## Future Enhancements
+
+- Add node deletion functionality
+- Implement node editing capabilities
+- Add different node types
+- Save/load functionality
+- Export canvas as image 
