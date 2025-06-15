@@ -19,6 +19,7 @@ html, body {
   width: 100vw;
 }
 
+/* Default ReactFlow node styles (fallback) */
 .react-flow__node-default {
   background: #fff;
   border: 2px solid #1a192b;
@@ -35,11 +36,99 @@ html, body {
   border-color: #ff6b6b;
 }
 
+/* Custom TaskNode styles */
+.task-node {
+  background: #fff;
+  border: 2px solid #1a192b;
+  border-radius: 8px;
+  color: #222;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  max-width: 250px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.task-node:hover {
+  border-color: #4a5568;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.task-node.selected {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.task-node-content {
+  padding: 12px;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-node-label {
+  font-weight: 500;
+  text-align: center;
+  word-wrap: break-word;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.task-node-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid #3182ce;
+  background: #f7fafc;
+}
+
+.task-node-hint {
+  font-size: 10px;
+  color: #a0aec0;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.task-node:hover .task-node-hint {
+  opacity: 1;
+}
+
+/* ReactFlow handle styles */
 .react-flow__handle {
   background: #1a192b;
+  border: 2px solid #fff;
+  width: 8px;
+  height: 8px;
+}
+
+.react-flow__handle:hover {
+  background: #3182ce;
 }
 
 .react-flow__edge {
   stroke: #1a192b;
   stroke-width: 2;
+}
+
+.react-flow__edge:hover {
+  stroke: #3182ce;
+}
+
+/* Focus styles for better accessibility */
+.task-node:focus-within {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 } 

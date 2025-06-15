@@ -7,6 +7,12 @@ import {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useNodeStore } from './store'
+import TaskNode from './components/TaskNode'
+
+// Define the node types for ReactFlow
+const nodeTypes = {
+  taskNode: TaskNode
+}
 
 function FlowCanvas() {
   const { 
@@ -15,20 +21,24 @@ function FlowCanvas() {
     addNode, 
     onNodesChange, 
     onEdgesChange, 
-    onConnect 
+    onConnect,
+    stopEditingNode
   } = useNodeStore()
   
   const { screenToFlowPosition } = useReactFlow()
 
   const onPaneClick = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>) => {
+      // Stop editing any node when clicking on empty canvas
+      stopEditingNode()
+      
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY
       })
       addNode(position)
     },
-    [screenToFlowPosition, addNode]
+    [screenToFlowPosition, addNode, stopEditingNode]
   )
 
   return (
@@ -36,6 +46,7 @@ function FlowCanvas() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -50,7 +61,10 @@ function FlowCanvas() {
             borderRadius: '5px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
-            Click anywhere on the canvas to add a new task node
+            <div>Click anywhere on the canvas to add a new task node</div>
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+              Double-click any node to edit its text
+            </div>
           </div>
         </Panel>
       </ReactFlow>
