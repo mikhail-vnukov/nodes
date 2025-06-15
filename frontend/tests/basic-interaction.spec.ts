@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Node Canvas App', () => {
   test.beforeEach(async ({ page }) => {
+    // Clear localStorage before each test to ensure clean state
     await page.goto('/')
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
   })
 
   test('should display the canvas', async ({ page }) => {
@@ -370,5 +373,74 @@ test.describe('Node Canvas App', () => {
     await input.fill('Successfully edited')
     await input.press('Enter')
     await expect(page.getByTestId('task-node-label')).toHaveText('Successfully edited')
+  })
+
+  test('should persist nodes to localStorage and restore them on page refresh', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    
+    // Create first node with custom text
+    await canvas.dblclick({ position: { x: 200, y: 150 } })
+    const input1 = page.getByTestId('task-node-input')
+    await input1.clear()
+    await input1.fill('Persistent Task 1')
+    await input1.press('Enter')
+    
+    // Create second node with custom text
+    await canvas.dblclick({ position: { x: 400, y: 300 } })
+    const input2 = page.getByTestId('task-node-input')
+    await input2.clear()
+    await input2.fill('Persistent Task 2')
+    await input2.press('Enter')
+    
+    // Verify nodes are present before refresh
+    await expect(page.getByTestId('task-node')).toHaveCount(2)
+    await expect(page.getByTestId('task-node-label').nth(0)).toHaveText('Persistent Task 1')
+    await expect(page.getByTestId('task-node-label').nth(1)).toHaveText('Persistent Task 2')
+    
+    // Get positions before refresh
+    const firstNode = page.getByTestId('task-node').first()
+    const secondNode = page.getByTestId('task-node').nth(1)
+    const firstBoxBefore = await firstNode.boundingBox()
+    const secondBoxBefore = await secondNode.boundingBox()
+    
+    // Refresh the page
+    await page.reload()
+    
+    // Wait for the canvas to be ready after refresh
+    await page.waitForSelector('[data-testid="rf__wrapper"]')
+    
+    // Verify nodes are still present after refresh
+    await expect(page.getByTestId('task-node')).toHaveCount(2)
+    await expect(page.getByTestId('task-node-label').nth(0)).toHaveText('Persistent Task 1')
+    await expect(page.getByTestId('task-node-label').nth(1)).toHaveText('Persistent Task 2')
+    
+    // Verify positions are approximately the same (allow for small rendering differences)
+    const firstNodeAfter = page.getByTestId('task-node').first()
+    const secondNodeAfter = page.getByTestId('task-node').nth(1)
+    const firstBoxAfter = await firstNodeAfter.boundingBox()
+    const secondBoxAfter = await secondNodeAfter.boundingBox()
+    
+    expect(firstBoxBefore).not.toBeNull()
+    expect(secondBoxBefore).not.toBeNull()
+    expect(firstBoxAfter).not.toBeNull()
+    expect(secondBoxAfter).not.toBeNull()
+    
+    // Positions should be approximately in the same area (ReactFlow coordinates may differ from DOM coordinates)
+    expect(Math.abs(firstBoxAfter!.x - firstBoxBefore!.x)).toBeLessThan(200)
+    expect(Math.abs(firstBoxAfter!.y - firstBoxBefore!.y)).toBeLessThan(200)
+    expect(Math.abs(secondBoxAfter!.x - secondBoxBefore!.x)).toBeLessThan(200)
+    expect(Math.abs(secondBoxAfter!.y - secondBoxBefore!.y)).toBeLessThan(200)
+    
+    // Verify nodes are not in edit mode after refresh
+    await expect(page.getByTestId('task-node-input')).toHaveCount(0)
+    
+    // Create a third node to verify counter continues correctly
+    await page.waitForTimeout(100) // Small delay to ensure everything is ready
+    await canvas.dblclick({ position: { x: 300, y: 450 } })
+    await page.getByTestId('task-node-input').press('Enter')
+    
+    // Verify the third node was created with correct label
+    await expect(page.getByTestId('task-node')).toHaveCount(3)
+    await expect(page.getByTestId('task-node-label').nth(2)).toHaveText('Task 3')
   })
 }) 
