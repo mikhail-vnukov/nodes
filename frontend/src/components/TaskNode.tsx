@@ -20,8 +20,13 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
   // Focus input when editing starts
   useEffect(() => {
     if (data.isEditing && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
+      // Use setTimeout to ensure the input is fully rendered
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+          inputRef.current.select()
+        }
+      }, 0)
     }
   }, [data.isEditing])
 
