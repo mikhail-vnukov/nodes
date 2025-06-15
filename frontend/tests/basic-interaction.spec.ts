@@ -42,11 +42,13 @@ test.describe('Node Canvas App', () => {
     await canvas.dblclick({ position: { x: 200, y: 150 } })
     await page.getByTestId('task-node-input').press('Enter')
     await expect(page.getByTestId('task-node-label')).toHaveText('Task 1')
+    await page.waitForTimeout(100) // Small delay for reliability
     
     // Double-click second position and save
     await canvas.dblclick({ position: { x: 400, y: 300 } })
     await page.getByTestId('task-node-input').press('Enter')
     await expect(page.getByTestId('task-node-label').nth(1)).toHaveText('Task 2')
+    await page.waitForTimeout(100) // Small delay for reliability
     
     // Double-click third position and save
     await canvas.dblclick({ position: { x: 300, y: 400 } })
@@ -215,5 +217,158 @@ test.describe('Node Canvas App', () => {
       // Focus may not work reliably in headless browsers, so just check the input is visible
       await expect(input).toBeVisible()
     }
+  })
+
+  // Additional comprehensive tests
+
+  test('should not create nodes on single click', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    
+    // Single click should not create a node
+    await canvas.click({ position: { x: 300, y: 200 } })
+    
+    // Wait a bit to ensure no node appears
+    await page.waitForTimeout(300)
+    
+    // Verify no nodes were created
+    await expect(page.getByTestId('task-node')).toHaveCount(0)
+  })
+
+  test('should handle very long text input', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    
+    const longText = 'This is a very long task name that exceeds normal expectations and should be handled gracefully by the application without breaking the layout or functionality'
+    
+    const input = page.getByTestId('task-node-input')
+    await input.clear()
+    await input.fill(longText)
+    await input.press('Enter')
+    
+    // Check that the text is saved correctly
+    await expect(page.getByTestId('task-node-label')).toHaveText(longText)
+    
+    // Verify the node layout isn't broken
+    const taskNode = page.getByTestId('task-node').first()
+    const nodeBox = await taskNode.boundingBox()
+    expect(nodeBox).not.toBeNull()
+    expect(nodeBox!.width).toBeGreaterThan(0)
+    expect(nodeBox!.height).toBeGreaterThan(0)
+  })
+
+  test('should handle special characters in text', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    
+    const specialText = '!@#$%^&*()_+-={}[]|\\:";\'<>?,./ 🚀 ñ ü ß'
+    
+    const input = page.getByTestId('task-node-input')
+    await input.clear()
+    await input.fill(specialText)
+    await input.press('Enter')
+    
+    // Check that special characters are preserved
+    await expect(page.getByTestId('task-node-label')).toHaveText(specialText)
+  })
+
+  test('should switch editing between multiple nodes', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    
+    // Create first node
+    await canvas.dblclick({ position: { x: 200, y: 200 } })
+    await page.getByTestId('task-node-input').press('Enter')
+    
+    // Create second node
+    await canvas.dblclick({ position: { x: 400, y: 200 } })
+    await page.getByTestId('task-node-input').press('Enter')
+    
+    // Start editing first node
+    await page.getByTestId('task-node').first().dblclick()
+    await expect(page.getByTestId('task-node-input')).toHaveValue('Task 1')
+    
+    // Switch to editing second node
+    await page.getByTestId('task-node').nth(1).dblclick()
+    await expect(page.getByTestId('task-node-input')).toHaveValue('Task 2')
+    
+    // Verify only one input is visible at a time
+    await expect(page.getByTestId('task-node-input')).toHaveCount(1)
+  })
+
+  test('should maintain node positions after editing', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    
+    // Get initial position
+    const taskNode = page.getByTestId('task-node').first()
+    const initialBox = await taskNode.boundingBox()
+    
+    // Edit the text
+    const input = page.getByTestId('task-node-input')
+    await input.clear()
+    await input.fill('Modified Task Name')
+    await input.press('Enter')
+    
+    // Get position after editing
+    const finalBox = await taskNode.boundingBox()
+    
+    // Position should remain approximately the same
+    expect(Math.abs(finalBox!.x - initialBox!.x)).toBeLessThan(10)
+    expect(Math.abs(finalBox!.y - initialBox!.y)).toBeLessThan(10)
+  })
+
+  test('should handle whitespace-only text input', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    
+    const input = page.getByTestId('task-node-input')
+    await input.clear()
+    await input.fill('   ')  // Only spaces
+    await input.press('Enter')
+    
+    // Should revert to default since whitespace gets trimmed
+    await expect(page.getByTestId('task-node-label')).toHaveText('Task 1')
+  })
+
+  test('should prevent node creation when clicking during editing', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    
+    // Create a node and start editing
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    await expect(page.getByTestId('task-node-input')).toBeVisible()
+    
+    // Try to create another node while editing (should not work)
+    await canvas.dblclick({ position: { x: 500, y: 300 } })
+    
+    // Should still only have one node
+    await expect(page.getByTestId('task-node')).toHaveCount(1)
+    
+    // Should exit edit mode
+    await expect(page.getByTestId('task-node-input')).not.toBeVisible()
+  })
+
+  test('should handle editing cancellation and restart', async ({ page }) => {
+    const canvas = page.getByTestId('rf__wrapper')
+    await canvas.dblclick({ position: { x: 300, y: 200 } })
+    await page.getByTestId('task-node-input').press('Enter')
+    
+    // Start editing
+    await page.getByTestId('task-node').first().dblclick()
+    const input = page.getByTestId('task-node-input')
+    await input.clear()
+    await input.fill('Cancelled text')
+    
+    // Cancel editing
+    await input.press('Escape')
+    await expect(page.getByTestId('task-node-label')).toHaveText('Task 1')
+    
+    // Start editing again
+    await page.getByTestId('task-node').first().dblclick()
+    await expect(page.getByTestId('task-node-input')).toHaveValue('Task 1')
+    
+    // Make a successful edit
+    await input.clear()
+    await input.fill('Successfully edited')
+    await input.press('Enter')
+    await expect(page.getByTestId('task-node-label')).toHaveText('Successfully edited')
   })
 }) 

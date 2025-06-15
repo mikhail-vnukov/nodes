@@ -26,7 +26,7 @@ const TaskNode: React.FC<NodeProps<TaskNodeData>> = ({ id, data, selected }) => 
           inputRef.current.focus()
           inputRef.current.select()
         }
-      }, 0)
+      }, 100)
     }
   }, [data.isEditing])
 
